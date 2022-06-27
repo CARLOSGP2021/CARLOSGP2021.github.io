@@ -23,7 +23,7 @@ timezone:
 
 title: 卡卡成长汇聚阿豹                         # the main title
 
-tagline: 这里是卡卡成长汇聚阿豹的博客～   # it will display as the sub-title
+tagline: 微信公众号：卡卡成长汇聚   # it will display as the sub-title
 
 description: >-                        # used by seo meta and the atom feed
     这是通过Chirpy主题配置而成的
@@ -40,7 +40,7 @@ github:
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: tomstillcoding
+  name: CARLOSGP2021
   email: example@doamin.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link

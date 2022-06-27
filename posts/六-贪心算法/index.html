@@ -1,0 +1,709 @@
+<!DOCTYPE html><html lang="zh-CN" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="prefer-datetime-locale" content="Asia/Shanghai"><meta name="generator" content="Jekyll v4.2.2" /><meta property="og:title" content="六、贪心算法" /><meta name="author" content="卡卡成长汇聚阿豹" /><meta property="og:locale" content="zh_CN" /><meta name="description" content="435. 无重叠区间" /><meta property="og:description" content="435. 无重叠区间" /><link rel="canonical" href="/posts/%E5%85%AD-%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/" /><meta property="og:url" content="/posts/%E5%85%AD-%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/" /><meta property="og:site_name" content="卡卡成长汇聚阿豹" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2022-06-23T02:34:00+00:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="六、贪心算法" /><meta name="twitter:site" content="@twitter_username" /><meta name="twitter:creator" content="@卡卡成长汇聚阿豹" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"卡卡成长汇聚阿豹"},"dateModified":"2022-06-27T07:10:18+00:00","datePublished":"2022-06-23T02:34:00+00:00","description":"435. 无重叠区间","headline":"六、贪心算法","mainEntityOfPage":{"@type":"WebPage","@id":"/posts/%E5%85%AD-%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/"},"url":"/posts/%E5%85%AD-%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/"}</script><title>六、贪心算法 | 卡卡成长汇聚阿豹</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="卡卡成长汇聚阿豹"><meta name="application-name" content="卡卡成长汇聚阿豹"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get MODE_ATTR() { return "data-mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_ATTR); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc" data-topbar-visible="true"><div id="sidebar" class="d-flex flex-column align-items-end"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" class="mx-auto"> <img src="/assets/config/kaka.jpg" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">卡卡成长汇聚阿豹</a></div><div class="site-subtitle font-italic">微信公众号：卡卡成长汇聚</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>首页</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>分类</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tags ml-xl-3 mr-xl-3 unloaded"></i> <span>标签</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>归档</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info ml-xl-3 mr-xl-3 unloaded"></i> <span>关于</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/CARLOSGP2021" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github"></i> </a> <a href="https://twitter.com/twitter_username" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['example','doamin.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></div><div id="topbar-wrapper"><div id="topbar" class="container d-flex align-items-center justify-content-between h-100 pl-3 pr-3 pl-md-4 pr-md-4"> <span id="breadcrumb"> <span> <a href="/"> 首页 </a> </span> <span>六、贪心算法</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> 文章</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="搜索..."> </span> <span id="search-cancel" >取消</span></div></div><div id="main-wrapper" class="d-flex justify-content-center"><div id="main" class="container pl-xl-4 pr-xl-4"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-9 pr-xl-4"><div class="post pl-1 pr-1 pl-md-2 pr-md-2"><h1 data-toc-skip>六、贪心算法</h1><div class="post-meta text-muted"> <span> 发表于 <em class="" data-ts="1655951640" data-df="YYYY-MM-DD" data-toggle="tooltip" data-placement="bottom"> 2022-06-23 </em> </span> <span> 更新于 <em class="" data-ts="1656313818" data-df="YYYY-MM-DD" data-toggle="tooltip" data-placement="bottom"> 2022-06-27 </em> </span><div class="d-flex justify-content-between"> <span> 作者 <em> CARLOSGP2021 </em> </span><div> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="7877 字"> <em>43 分钟</em>阅读</span></div></div></div><div class="post-content"><h2 id="435-无重叠区间"><span class="mr-2">435. 无重叠区间</span><a href="#435-无重叠区间" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>给定一个区间的集合 <code class="language-plaintext highlighter-rouge">intervals </code>，其中 <code class="language-plaintext highlighter-rouge">intervals[i] = [starti, endi]</code> ，返回需要移除区间的最小数量，使剩余区间互不重叠 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="o">:</span> <span class="n">intervals</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]]</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">1</span>
+<span class="n">解释</span><span class="o">:</span> <span class="n">移除</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="n">后</span><span class="err">，</span><span class="n">剩下的区间没有重叠</span><span class="err">。</span>
+</pre></table></code></div></div><p>右边界排序，从左向右记录非交叉区间的个数，最后用区间总数减去非交叉区间的个数就是需要移除的区间个数了。</p><p>右边界排序之后，局部最优：优先选右边界小的区间，所以从左向右遍历，留给下一个区间的空间大一些，从而尽量避免交叉。全局最优：选取最多的非交叉区间。局部最优推出全局最优，试试贪心！</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041059719.png" alt="image-20220604105951584" style="zoom:80%;" data-proofer-ignore></div><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// 按照区间右边界排序</span>
+    <span class="k">static</span> <span class="n">bool</span> <span class="nf">cmp</span> <span class="p">(</span><span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="n">int</span> <span class="nf">eraseOverlapIntervals</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">intervals</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">intervals</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">intervals</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">intervals</span><span class="mf">.</span><span class="nb">end</span><span class="p">(),</span> <span class="n">cmp</span><span class="p">);</span>
+        <span class="n">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 记录非交叉区间的个数</span>
+        <span class="n">int</span> <span class="n">end</span> <span class="o">=</span> <span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span> <span class="c1">// 记录区间分割点</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">intervals</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">end</span> <span class="o">&lt;=</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+                <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">intervals</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="n">count</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="452-用最少数量的箭引爆气球"><span class="mr-2">452. 用最少数量的箭引爆气球</span><a href="#452-用最少数量的箭引爆气球" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>有一些球形气球贴在一堵用 XY 平面表示的墙面上。墙面上的气球记录在整数数组 <code class="language-plaintext highlighter-rouge">points </code>，其中<code class="language-plaintext highlighter-rouge">points[i] = [xstart, xend] </code>表示水平直径在 <code class="language-plaintext highlighter-rouge">xstart </code>和 <code class="language-plaintext highlighter-rouge">xend</code>之间的气球。你不知道气球的确切 y 坐标。</p><p>一支弓箭可以沿着 x 轴从不同点 完全垂直 地射出。在坐标 x 处射出一支箭，若有一个气球的直径的开始和结束坐标为<code class="language-plaintext highlighter-rouge"> xstart，xend</code>， 且满足 <code class="language-plaintext highlighter-rouge">xstart ≤ x ≤ xend</code>，则该气球会被 引爆 。可以射出的弓箭的数量 没有限制 。 弓箭一旦被射出之后，可以无限地前进。</p><p>给你一个数组 <code class="language-plaintext highlighter-rouge">points</code> ，返回引爆所有气球所必须射出的<strong>最小</strong>弓箭数 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span><span class="mi">16</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">12</span><span class="p">]]</span>
+<span class="n">输出</span><span class="err">：</span><span class="mi">2</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">气球可以用2支箭来爆破</span><span class="o">:</span>
+<span class="o">-</span><span class="n">在x</span> <span class="o">=</span> <span class="mi">6</span><span class="n">处射出箭</span><span class="err">，</span><span class="n">击破气球</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span><span class="n">和</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span><span class="err">。</span>
+<span class="o">-</span><span class="n">在x</span> <span class="o">=</span> <span class="mi">11</span><span class="n">处发射箭</span><span class="err">，</span><span class="n">击破气球</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">16</span><span class="p">]</span><span class="n">和</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span><span class="err">。</span>
+</pre></table></code></div></div><p>这道题和<strong>435. 无重叠区间</strong>一模一样，就是求非交叉区间的个数。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">static</span> <span class="n">bool</span> <span class="nf">cmp</span><span class="p">(</span><span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">b</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="n">int</span> <span class="nf">findMinArrowShots</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">points</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">points</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">points</span><span class="mf">.</span><span class="nb">end</span><span class="p">(),</span> <span class="n">cmp</span><span class="p">);</span>
+        <span class="n">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">end</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">points</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">end</span> <span class="o">&lt;</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]){</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+                <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><p><strong>另一种思路</strong>：</p><p>局部最优：当气球出现重叠，一起射，所用弓箭最少。全局最优：把所有气球射爆所用弓箭最少。为了让气球尽可能的重叠，需要对数组进行排序。如果把气球排序之后，从前到后遍历气球，被射过的气球仅仅跳过就行了，只要记录一下箭的数量就可以了。</p><p>那么按照气球起始位置排序，还是按照气球终止位置排序呢？其实都可以！只不过对应的遍历顺序不同，我就按照气球的<strong>起始位置</strong>排序了。既然按照起始位置排序，那么就从前向后遍历气球数组，靠左尽可能让气球重复。从前向后遍历遇到重叠的气球了怎么办？如果气球重叠了，重叠气球中右边界的最小值之前的区间一定需要一个弓箭。</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041118110.png" alt="image-20220604111850994" style="zoom:80%;" data-proofer-ignore></div><p>可以看出首先第一组重叠气球，一定是需要一个箭。气球3的左边界大于了第一组重叠气球的最小右边界，所以再需要一支箭来射气球3了。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">private</span><span class="o">:</span>
+    <span class="k">static</span> <span class="n">bool</span> <span class="nf">cmp</span><span class="p">(</span><span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">findMinArrowShots</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">points</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">points</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">points</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">points</span><span class="mf">.</span><span class="nb">end</span><span class="p">(),</span> <span class="n">cmp</span><span class="p">);</span>
+        <span class="n">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// points 不为空至少需要一支箭</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">points</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>  <span class="c1">// 气球i和气球i-1不挨着，注意这里不是&gt;=</span>
+                <span class="n">result</span><span class="o">++</span><span class="p">;</span> <span class="c1">// 需要一支箭</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  <span class="c1">// 气球i和气球i-1挨着</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]);</span> <span class="c1">// 更新重叠气球最小右边界</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><p>注意：题目中说的是满足 <code class="language-plaintext highlighter-rouge">xstart ≤ x ≤ xend</code>，则该气球会被引爆。那么说明两个气球挨在一起不重叠也可以一起射爆，所以代码中 <code class="language-plaintext highlighter-rouge">if (points[i][0] &gt; points[i - 1][1])</code> 不能是<code class="language-plaintext highlighter-rouge">&gt;=</code>。</p><h2 id="455-分发饼干"><span class="mr-2">455. 分发饼干</span><a href="#455-分发饼干" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>假设你是一位很棒的家长，想要给你的孩子们一些小饼干。但是，每个孩子最多只能给一块饼干。对每个孩子 <code class="language-plaintext highlighter-rouge">i</code>，都有一个胃口值<code class="language-plaintext highlighter-rouge">g[i]</code>，这是能让孩子们满足胃口的饼干的最小尺寸；并且每块饼干 <code class="language-plaintext highlighter-rouge">j</code>，都有一个尺寸 <code class="language-plaintext highlighter-rouge">s[j]</code> 。如果<code class="language-plaintext highlighter-rouge"> s[j] &gt;= g[i]</code>，我们可以将这个饼干 <code class="language-plaintext highlighter-rouge">j</code> 分配给孩子 <code class="language-plaintext highlighter-rouge">i</code> ，这个孩子会得到满足。你的目标是尽可能满足越多数量的孩子，并输出这个最大数值。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="o">:</span> <span class="n">g</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">1</span>
+<span class="n">解释</span><span class="o">:</span> <span class="n">你有三个孩子和两块小饼干</span><span class="err">，</span><span class="mi">3</span><span class="n">个孩子的胃口值分别是</span><span class="err">：</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="err">。</span><span class="n">虽然你有两块小饼干</span><span class="err">，</span><span class="n">由于他们的尺寸都是1</span><span class="err">，</span><span class="n">你只能让胃口值是1的孩子满足</span><span class="err">。</span><span class="n">所以你应该输出1</span><span class="err">。</span>
+</pre></table></code></div></div><p>这里的局部最优就是大饼干喂给胃口大的，充分利用饼干尺寸喂饱每一个，全局最优就是喂饱尽可能多的小孩。可以尝试使用贪心策略，先将饼干数组和小孩数组排序，然后从后向前遍历小孩数组，用大饼干优先满足胃口大的，并统计满足小孩数量。</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041508120.png" alt="image-20220604150855991" style="zoom:80%;" data-proofer-ignore></div><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">findContentChildren</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">g</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">g</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">g</span><span class="mf">.</span><span class="nb">end</span><span class="p">());</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">s</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">s</span><span class="mf">.</span><span class="nb">end</span><span class="p">());</span>
+        <span class="n">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">s</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 饼干数组的下标</span>
+        <span class="n">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">g</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">s</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">result</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">index</span><span class="o">--</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><p>用了一个<code class="language-plaintext highlighter-rouge">index</code>来控制饼干数组的遍历，遍历饼干并没有再起一个for循环，而是采用自减的方式。因为一块饼干在分配之后，后面的孩子就要从下一块饼干开始分配了，所以不能采用两层for循环。</p><h2 id="135-分发糖果"><span class="mr-2">135. 分发糖果</span><a href="#135-分发糖果" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>n 个孩子站成一排。给你一个整数数组 <code class="language-plaintext highlighter-rouge">ratings </code>表示每个孩子的评分。你需要按照以下要求，给这些孩子分发糖果：每个孩子至少分配到 1 个糖果，相邻两个孩子评分更高的孩子会获得更多的糖果。请你给每个孩子分发糖果，计算并返回需要准备的<strong>最少</strong>糖果数目 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">ratings</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">输出</span><span class="err">：</span><span class="mi">5</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">你可以分别给第一个</span><span class="err">、</span><span class="n">第二个</span><span class="err">、</span><span class="n">第三个孩子分发</span> <span class="mi">2</span><span class="err">、</span><span class="mi">1</span><span class="err">、</span><span class="mi">2</span> <span class="n">颗糖果</span><span class="err">。</span>
+</pre></table></code></div></div><p>我们可以将「相邻的孩子中，评分高的孩子必须获得更多的糖果」这句话拆分为两个规则，分别处理。</p><ul><li><p>左规则：当<code class="language-plaintext highlighter-rouge">ratings[i - 1] &lt; ratings[i]</code>时，<code class="language-plaintext highlighter-rouge">i</code>号学生的糖果数量将比<code class="language-plaintext highlighter-rouge">i-1</code>号孩子的糖果数量多。</p><li><p>右规则：当<code class="language-plaintext highlighter-rouge">ratings[i] &gt; ratings[i + 1]</code>时，<code class="language-plaintext highlighter-rouge">i</code>号学生的糖果数量将比<code class="language-plaintext highlighter-rouge">i + 1</code>号孩子的糖果数量多。</p></ul><p>我们遍历该数组两次，处理出每一个学生分别满足左规则或右规则时，<strong>最少</strong>需要被分得的糖果数量。每个人最终分得的糖果数量即为这两个数量的<strong>最大值</strong>。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">candy</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">ratings</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="nf">candyVec</span><span class="p">(</span><span class="n">ratings</span><span class="mf">.</span><span class="nf">size</span><span class="p">(),</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="c1">// 从前向后</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ratings</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ratings</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="n">candyVec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">candyVec</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">// 从后向前</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">ratings</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ratings</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+                <span class="n">candyVec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">candyVec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">candyVec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="c1">// 统计结果</span>
+        <span class="n">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">candyVec</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">result</span> <span class="o">+=</span> <span class="n">candyVec</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="406根据身高重建队列"><span class="mr-2">406.根据身高重建队列</span><a href="#406根据身高重建队列" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>假设有打乱顺序的一群人站成一个队列，数组 <code class="language-plaintext highlighter-rouge">people </code>表示队列中一些人的属性（不一定按顺序）。每个 <code class="language-plaintext highlighter-rouge">people[i] = [hi, ki]</code> 表示第 <code class="language-plaintext highlighter-rouge">i</code> 个人的身高为 <code class="language-plaintext highlighter-rouge">hi </code>，前面 正好 有 <code class="language-plaintext highlighter-rouge">ki </code>个身高大于或等于 <code class="language-plaintext highlighter-rouge">hi </code>的人。</p><p>请你重新构造并返回输入数组 <code class="language-plaintext highlighter-rouge">people </code>所表示的队列，返回的队列应该格式化为数组<code class="language-plaintext highlighter-rouge">queue </code>，其中 <code class="language-plaintext highlighter-rouge">queue[j] = [hj, kj]</code> 是队列中第 <code class="language-plaintext highlighter-rouge">j</code> 个人的属性（<code class="language-plaintext highlighter-rouge">queue[0] </code>是排在队列前面的人）。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">people</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
+<span class="n">输出</span><span class="err">：</span><span class="p">[[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+</pre></table></code></div></div><p>一般这种数对，还涉及排序的，根据第一个元素正向排序，根据第二个元素反向排序，或者根据第一个元素反向排序，根据第二个元素正向排序，往往能够简化解题过程。</p><p>在本题目中，首先对数对进行排序，按照数对的元素 1 降序排序，按照数对的元素 2 升序排序。原因是按照元素 1 进行<strong>降序</strong>排序，对于每个元素，在其之前的元素的个数，就是大于等于他的元素的数量，而按照第二个元素<strong>升序</strong>排序，我们希望 k 大的尽量在后面，减少插入操作的次数。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">static</span> <span class="n">bool</span> <span class="nf">cmp</span><span class="p">(</span><span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="no">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;</span> <span class="nf">reconstructQueue</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">people</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">sort</span> <span class="p">(</span><span class="n">people</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">people</span><span class="mf">.</span><span class="nb">end</span><span class="p">(),</span> <span class="n">cmp</span><span class="p">);</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;</span> <span class="n">que</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">people</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">int</span> <span class="n">position</span> <span class="o">=</span> <span class="n">people</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">];</span>
+            <span class="n">que</span><span class="mf">.</span><span class="nf">insert</span><span class="p">(</span><span class="n">que</span><span class="mf">.</span><span class="nf">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">position</span><span class="p">,</span> <span class="n">people</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">que</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="376-摆动序列"><span class="mr-2">376. 摆动序列</span><a href="#376-摆动序列" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>如果连续数字之间的差严格地在正数和负数之间交替，则数字序列称为 摆动序列 。第一个差（如果存在的话）可能是正数或负数。仅有一个元素或者含两个不等元素的序列也视作摆动序列。</p><p>例如， [1, 7, 4, 9, 2, 5] 是一个 摆动序列 ，因为差值 (6, -3, 5, -7, 3) 是正负交替出现的。相反，[1, 4, 7, 2, 5] 和 [1, 7, 4, 5, 5] 不是摆动序列，第一个序列是因为它的前两个差值都是正数，第二个序列是因为它的最后一个差值为零。</p><p>子序列 可以通过从原始序列中删除一些（也可以不删除）元素来获得，剩下的元素保持其原始顺序。给你一个整数数组 nums ，返回 nums 中作为 摆动序列 的 最长子序列的长度 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">nums</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">输出</span><span class="err">：</span><span class="mi">6</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">整个序列均为摆动序列</span><span class="err">，</span><span class="nf">各元素之间的差值为</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="err">。</span>
+</pre></table></code></div></div><p>局部最优：删除单调坡度上的节点（不包括单调坡度两端的节点），那么这个坡度就可以有两个局部峰值。整体最优：整个序列有最多的局部峰值，从而达到最长摆动序列。</p><p>实际操作上，其实连删除的操作都不用做，因为题目要求的是最长摆动子序列的长度，所以只需要统计数组的峰值数量就可以了（相当于是删除单一坡度上的节点，然后统计长度）。这就是贪心所贪的地方，让峰值尽可能的保持峰值，然后删除单一坡度上的节点。</p><p>本题代码实现中，还有一些技巧，例如统计峰值的时候，数组最左面和最右面是最不好统计的。例如序列[2,5]，它的峰值数量是2，如果靠统计差值来计算峰值个数就需要考虑数组最左面和最右面的特殊情况。所以可以针对序列[2,5]，可以假设为[2,2,5]，这样它就有坡度了即preDiff = 0，如图：</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041541717.png" alt="image-20220604154143611" style="zoom:80%;" data-proofer-ignore></div><p>针对以上情形，result初始为1（默认最右面有一个峰值），此时curDiff &gt; 0 &amp;&amp; preDiff &lt;= 0，那么result++（计算了左面的峰值），最后得到的result就是2（峰值个数为2即摆动序列长度为2）</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">wiggleMaxLength</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span>
+        <span class="n">int</span> <span class="n">curDiff</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 当前一对差值</span>
+        <span class="n">int</span> <span class="n">preDiff</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 前一对差值</span>
+        <span class="n">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>  <span class="c1">// 记录峰值个数，序默认序列最右边有一个峰值</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">curDiff</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="c1">// 出现峰值</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">curDiff</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">preDiff</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">preDiff</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">curDiff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">result</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">preDiff</span> <span class="o">=</span> <span class="n">curDiff</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="55-跳跃游戏"><span class="mr-2">55. 跳跃游戏</span><a href="#55-跳跃游戏" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>给定一个非负整数数组 <code class="language-plaintext highlighter-rouge">nums </code>，你最初位于数组的 第一个下标 。数组中的每个元素代表你在该位置可以跳跃的最大长度，判断你是否能够到达最后一个下标。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">nums</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">输出</span><span class="err">：</span><span class="kc">true</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">可以先跳</span> <span class="mi">1</span> <span class="n">步</span><span class="err">，</span><span class="n">从下标</span> <span class="mi">0</span> <span class="n">到达下标</span> <span class="mi">1</span><span class="p">,</span> <span class="n">然后再从下标</span> <span class="mi">1</span> <span class="n">跳</span> <span class="mi">3</span> <span class="n">步到达最后一个下标</span><span class="err">。</span>
+</pre></table></code></div></div><p>这道题目关键点在于：不用拘泥于每次究竟跳几步，而是看覆盖范围，覆盖范围内一定是可以跳过来的，不用管是怎么跳的。</p><p>这个问题转化为跳跃覆盖范围究竟可不可以覆盖到终点！每次移动取最大跳跃步数（得到最大的覆盖范围），每移动一个单位，就更新最大覆盖范围。贪心算法局部最优解：每次取最大跳跃步数（取最大覆盖范围），整体最优解：最后得到整体最大覆盖范围，看是否能到终点。</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041600729.png" alt="image-20220604160039587" style="zoom:80%;" data-proofer-ignore></div><p><code class="language-plaintext highlighter-rouge">i</code>每次移动只能在cover的范围内移动，每移动一个元素，cover得到该元素数值（新的覆盖范围）的补充，让<code class="language-plaintext highlighter-rouge">i</code>继续移动下去。而cover每次只取 max (该元素数值补充后的范围, cover本身范围)，如果cover大于等于了终点下标，直接return true就可以了。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">bool</span> <span class="nf">canJump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">int</span> <span class="n">cover</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="c1">// 只有一个元素，就是能达到</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">cover</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 注意这里是小于等于cover</span>
+            <span class="n">cover</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cover</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">cover</span> <span class="o">&gt;=</span> <span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="c1">// 说明可以覆盖到终点了</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="45-跳跃游戏-ii"><span class="mr-2">45. 跳跃游戏 II</span><a href="#45-跳跃游戏-ii" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>给你一个非负整数数组 nums ，你最初位于数组的第一个位置，数组中的每个元素代表你在该位置可以跳跃的最大长度。你的目标是使用最少的跳跃次数到达数组的最后一个位置，假设你总是可以到达数组的最后一个位置。</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre>输入: nums = [2,3,1,1,4]
+输出: 2
+解释: 跳到最后一个位置的最小跳跃数是 2。从下标为 0 跳到下标为 1 的位置，跳 1 步，然后跳 3 步到达数组的最后一个位置。
+</pre></table></code></div></div><p>本题要计算最小步数，那么就要想清楚什么时候步数才一定要加一呢？贪心的思路，局部最优：当前可移动距离尽可能多走，如果还没到终点，步数再加一。整体最优：一步尽可能多走，从而达到最小步数。</p><p>从覆盖范围出发，不管怎么跳，覆盖范围内一定是可以跳到的，<strong>以最小的步数增加覆盖范围</strong>，覆盖范围一旦覆盖了终点，得到的就是最小步数！这里需要统计两个覆盖范围，<strong>当前这一步的最大覆盖和下一步最大覆盖</strong>。如果移动下标达到了当前这一步的最大覆盖最远距离了，还没有到终点的话，那么就必须再走一步来增加覆盖范围，直到覆盖范围覆盖了终点。</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041611931.png" alt="image-20220604161108806" style="zoom:80%;" data-proofer-ignore></div><p>移动下标只要遇到当前覆盖最远距离的下标，直接步数加一，不考虑是不是终点的情况。想要达到这样的效果，只要让移动下标，最大只能移动到<code class="language-plaintext highlighter-rouge">nums.size - 2</code>的地方就可以了。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">jump</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">int</span> <span class="n">curDistance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>    <span class="c1">// 当前覆盖的最远距离下标</span>
+        <span class="n">int</span> <span class="n">ans</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>            <span class="c1">// 记录走的最大步数</span>
+        <span class="n">int</span> <span class="n">nextDistance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>   <span class="c1">// 下一步覆盖的最远距离下标</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 注意这里是小于nums.size() - 1，这是关键所在</span>
+            <span class="n">nextDistance</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">nextDistance</span><span class="p">);</span> <span class="c1">// 更新下一步覆盖的最远距离下标</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">curDistance</span><span class="p">)</span> <span class="p">{</span>                 <span class="c1">// 遇到当前覆盖的最远距离下标</span>
+                <span class="n">curDistance</span> <span class="o">=</span> <span class="n">nextDistance</span><span class="p">;</span>         <span class="c1">// 更新当前覆盖的最远距离下标</span>
+                <span class="n">ans</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">ans</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="1005k次取反后最大化的数组和"><span class="mr-2">1005.K次取反后最大化的数组和</span><a href="#1005k次取反后最大化的数组和" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>给你一个整数数组 <code class="language-plaintext highlighter-rouge">nums </code>和一个整数 <code class="language-plaintext highlighter-rouge">k</code> ，按以下方法修改该数组：选择某个下标 <code class="language-plaintext highlighter-rouge">i </code>并将 <code class="language-plaintext highlighter-rouge">nums[i]</code> 替换为 <code class="language-plaintext highlighter-rouge">-nums[i]</code> 。重复这个过程恰好 <code class="language-plaintext highlighter-rouge">k</code> 次。可以多次选择同一个下标 <code class="language-plaintext highlighter-rouge">i </code>。以这种方式修改数组后，返回数组可能的最大和 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">nums</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">输出</span><span class="err">：</span><span class="mi">5</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">选择下标</span> <span class="mi">1</span> <span class="err">，</span><span class="n">nums</span> <span class="n">变为</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="err">。</span>
+</pre></table></code></div></div><p>贪心的思路，局部最优：让绝对值大的负数变为正数，当前数值达到最大，整体最优：整个数组和达到最大。那么如果将负数都转变为正数了，K依然大于0，此时的问题是一个有序正整数序列，如何转变K次正负，让 数组和 达到最大。那么又是一个贪心：局部最优：只找数值最小的正整数进行反转，当前数值可以达到最大，全局最优：整个 数组和 达到最大。</p><p>那么本题的解题步骤为：</p><ul><li>第一步：将数组按照绝对值大小从大到小排序，<strong>注意要按照绝对值的大小</strong><li>第二步：从前向后遍历，遇到负数将其变为正数，同时<code class="language-plaintext highlighter-rouge">k--</code><li>第三步：如果k还大于0，那么反复转变数值最小的元素，将k用完<li>第四步：求和</ul><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">static</span> <span class="n">bool</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">int</span> <span class="n">a</span><span class="p">,</span> <span class="n">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">largestSumAfterKNegations</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">nums</span><span class="p">,</span> <span class="n">int</span> <span class="n">k</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">nums</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">nums</span><span class="mf">.</span><span class="nb">end</span><span class="p">(),</span> <span class="n">cmp</span><span class="p">);</span>       <span class="c1">// 第一步</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 第二步</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+                <span class="n">k</span><span class="o">--</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="n">nums</span><span class="p">[</span><span class="n">nums</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="c1">// 第三步</span>
+        <span class="n">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">a</span> <span class="o">:</span> <span class="n">nums</span><span class="p">)</span> <span class="n">result</span> <span class="o">+=</span> <span class="n">a</span><span class="p">;</span>        <span class="c1">// 第四步</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="134-加油站"><span class="mr-2">134. 加油站</span><a href="#134-加油站" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>在一条环路上有 <code class="language-plaintext highlighter-rouge">n</code> 个加油站，其中第 <code class="language-plaintext highlighter-rouge">i</code> 个加油站有汽油 <code class="language-plaintext highlighter-rouge">gas[i]</code> 升。你有一辆油箱容量无限的的汽车，从第 <code class="language-plaintext highlighter-rouge">i</code> 个加油站开往第 <code class="language-plaintext highlighter-rouge">i+1</code> 个加油站需要消耗汽油 <code class="language-plaintext highlighter-rouge">cost[i]</code> 升。你从其中的一个加油站出发，开始时油箱为空。给定两个整数数组 <code class="language-plaintext highlighter-rouge">gas</code> 和 <code class="language-plaintext highlighter-rouge">cost </code>，如果你可以绕环路行驶一周，则返回出发时加油站的编号，否则返回 -1 。如果存在解，则 保证 它是 唯一 的。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="o">:</span> <span class="n">gas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">cost</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">3</span>
+<span class="n">解释</span><span class="o">:</span>
+<span class="n">从</span> <span class="mi">3</span> <span class="nf">号加油站</span><span class="p">(</span><span class="n">索引为</span> <span class="mi">3</span> <span class="n">处</span><span class="p">)</span><span class="n">出发</span><span class="err">，</span><span class="n">可获得</span> <span class="mi">4</span> <span class="n">升汽油</span><span class="err">。</span><span class="n">此时油箱有</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">=</span> <span class="mi">4</span> <span class="n">升汽油</span>
+<span class="n">开往</span> <span class="mi">4</span> <span class="n">号加油站</span><span class="err">，</span><span class="n">此时油箱有</span> <span class="mi">4</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">=</span> <span class="mi">8</span> <span class="n">升汽油</span>
+<span class="n">开往</span> <span class="mi">0</span> <span class="n">号加油站</span><span class="err">，</span><span class="n">此时油箱有</span> <span class="mi">8</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">=</span> <span class="mi">7</span> <span class="n">升汽油</span>
+<span class="n">开往</span> <span class="mi">1</span> <span class="n">号加油站</span><span class="err">，</span><span class="n">此时油箱有</span> <span class="mi">7</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">=</span> <span class="mi">6</span> <span class="n">升汽油</span>
+<span class="n">开往</span> <span class="mi">2</span> <span class="n">号加油站</span><span class="err">，</span><span class="n">此时油箱有</span> <span class="mi">6</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">=</span> <span class="mi">5</span> <span class="n">升汽油</span>
+<span class="n">开往</span> <span class="mi">3</span> <span class="n">号加油站</span><span class="err">，</span><span class="n">你需要消耗</span> <span class="mi">5</span> <span class="n">升汽油</span><span class="err">，</span><span class="n">正好足够你返回到</span> <span class="mi">3</span> <span class="n">号加油站</span><span class="err">。</span>
+<span class="n">因此</span><span class="err">，</span><span class="mi">3</span> <span class="n">可为起始索引</span><span class="err">。</span>
+</pre></table></code></div></div><p>首先如果总油量减去总消耗大于等于零那么一定可以跑完一圈，说明各个站点的加油站与剩油量rest[i]相加一定是大于等于零的。</p><p>每个加油站的剩余量<code class="language-plaintext highlighter-rouge">rest[i]</code>为<code class="language-plaintext highlighter-rouge">gas[i] - cost[i]</code>。<code class="language-plaintext highlighter-rouge">i</code>从0开始累加<code class="language-plaintext highlighter-rouge">rest[i]</code>，和记为<code class="language-plaintext highlighter-rouge">curSum</code>，一旦<code class="language-plaintext highlighter-rouge">curSum</code>小于零，说明<code class="language-plaintext highlighter-rouge">[0, i]</code>区间都不能作为起始位置，起始位置从<code class="language-plaintext highlighter-rouge">i + 1</code>算起，再从0计算<code class="language-plaintext highlighter-rouge">curSum</code>。</p><div align="center"><img data-src="https://fastly.jsdelivr.net/gh/CARLOSGP2021/myFigures/img/202206041643622.png" alt="image-20220604164314694" style="zoom:80%;" data-proofer-ignore></div><p>那么为什么一旦[i，j] 区间和为负数，起始位置就可以是j+1呢，j+1后面就不会出现更大的负数？如果出现更大的负数，就是更新j，那么起始位置又变成新的j+1了。而且j之前出现了多少负数，j后面就会出现多少正数，因为耗油总和是大于零的（前提我们已经确定了一定可以跑完全程）。</p><p>那么局部最优：当前累加<code class="language-plaintext highlighter-rouge">rest[j]</code>的和<code class="language-plaintext highlighter-rouge">curSum</code>一旦小于0，起始位置至少要是<code class="language-plaintext highlighter-rouge">j + 1</code>，因为从<code class="language-plaintext highlighter-rouge">j</code>开始一定不行。全局最优：找到可以跑一圈的起始位置。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">canCompleteCircuit</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">gas</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">cost</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">int</span> <span class="n">curSum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">totalSum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">gas</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">curSum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="n">totalSum</span> <span class="o">+=</span> <span class="n">gas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">curSum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">// 当前累加rest[i]和 curSum一旦小于0</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>  <span class="c1">// 起始位置更新为i+1</span>
+                <span class="n">curSum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>     <span class="c1">// curSum从0开始</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">totalSum</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="c1">// 说明怎么走都不可能跑一圈了</span>
+        <span class="k">return</span> <span class="n">start</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="860柠檬水找零"><span class="mr-2">860.柠檬水找零</span><a href="#860柠檬水找零" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>在柠檬水摊上，每一杯柠檬水的售价为 5 美元。顾客排队购买你的产品，（按账单 bills 支付的顺序）一次购买一杯。每位顾客只买一杯柠檬水，然后向你付 5 美元、10 美元或 20 美元。你必须给每个顾客正确找零，也就是说净交易是每位顾客向你支付 5 美元。注意，一开始你手头没有任何零钱。给你一个整数数组 bills ，其中 <code class="language-plaintext highlighter-rouge">bills[i]</code> 是第 i 位顾客付的账。如果你能给每位顾客正确找零，返回 true ，否则返回 false 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">bills</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="n">输出</span><span class="err">：</span><span class="kc">true</span>
+<span class="n">解释</span><span class="err">：</span>
+<span class="n">前</span> <span class="mi">3</span> <span class="n">位顾客那里</span><span class="err">，</span><span class="n">我们按顺序收取</span> <span class="mi">3</span> <span class="n">张</span> <span class="mi">5</span> <span class="n">美元的钞票</span><span class="err">。</span>
+<span class="n">第</span> <span class="mi">4</span> <span class="n">位顾客那里</span><span class="err">，</span><span class="n">我们收取一张</span> <span class="mi">10</span> <span class="n">美元的钞票</span><span class="err">，</span><span class="n">并返还</span> <span class="mi">5</span> <span class="n">美元</span><span class="err">。</span>
+<span class="n">第</span> <span class="mi">5</span> <span class="n">位顾客那里</span><span class="err">，</span><span class="n">我们找还一张</span> <span class="mi">10</span> <span class="n">美元的钞票和一张</span> <span class="mi">5</span> <span class="n">美元的钞票</span><span class="err">。</span>
+<span class="n">由于所有客户都得到了正确的找零</span><span class="err">，</span><span class="n">所以我们输出</span> <span class="kc">true</span><span class="err">。</span>
+</pre></table></code></div></div><p>有如下三种情况：</p><ul><li>情况一：账单是5，直接收下；<li>情况二：账单是10，消耗一个5，增加一个10；<li>情况三：账单是20，优先消耗一个10和一个5，如果不够，再消耗三个5；</ul><p>账单是20的情况，为什么要优先消耗一个10和一个5呢？因为美元10只能给账单20找零，而美元5可以给账单10和账单20找零，美元5更万能！所以局部最优：遇到账单20，优先消耗美元10，完成本次找零。全局最优：完成全部账单的找零。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">bool</span> <span class="nf">lemonadeChange</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&amp;</span> <span class="n">bills</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">int</span> <span class="n">five</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">bill</span> <span class="o">:</span> <span class="n">bills</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 情况一</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bill</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="n">five</span><span class="o">++</span><span class="p">;</span>
+            <span class="c1">// 情况二</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bill</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">five</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+                <span class="n">ten</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">five</span><span class="o">--</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="c1">// 情况三</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bill</span> <span class="o">==</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// 优先消耗10美元，因为5美元的找零用处更大，能多留着就多留着</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">five</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">ten</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">five</span><span class="o">--</span><span class="p">;</span>
+                    <span class="n">ten</span><span class="o">--</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">five</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">five</span> <span class="o">-=</span> <span class="mi">3</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="763-划分字母区间"><span class="mr-2">763. 划分字母区间</span><a href="#763-划分字母区间" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>字符串 <code class="language-plaintext highlighter-rouge">S </code>由小写字母组成。我们要把这个字符串划分为尽可能多的片段，同一字母最多出现在一个片段中。返回一个表示每个字符串片段的长度的列表。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre> <span class="n">输入</span><span class="err">：</span><span class="nc">S</span> <span class="o">=</span> <span class="s2">"ababcbacadefegdehijhklij"</span>
+ <span class="n">输出</span><span class="err">：</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+ <span class="n">解释</span><span class="err">：</span>
+ <span class="n">划分结果为</span> <span class="s2">"ababcbaca"</span><span class="p">,</span> <span class="s2">"defegde"</span><span class="p">,</span> <span class="s2">"hijhklij"</span><span class="err">。</span><span class="n">每个字母最多出现在一个片段中</span><span class="err">。</span><span class="n">像</span> <span class="s2">"ababcbacadefegde"</span><span class="p">,</span> <span class="s2">"hijhklij"</span> <span class="n">的划分是错误的</span><span class="err">，</span><span class="n">因为划分的片段数较少</span><span class="err">。</span>
+</pre></table></code></div></div><p>在遍历的过程中要找每一个字母的边界，<strong>如果找到之前遍历过的所有字母的最远边界，说明这个边界就是分割点了</strong>。此时前面出现过所有字母，最远也就到这个边界了。可以分为如下两步：</p><ul><li>统计每一个字符最后出现的位置<li>从头遍历字符，并更新字符的最远出现下标，如果找到字符最远出现位置下标和当前下标相等了，则找到了分割点</ul><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="nf">partitionLabels</span><span class="p">(</span><span class="n">string</span> <span class="nc">S</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">int</span> <span class="n">hash</span><span class="p">[</span><span class="mi">27</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span> <span class="c1">// i为字符，hash[i]为字符出现的最后位置</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nc">S</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 统计每一个字符最后出现的位置</span>
+            <span class="n">hash</span><span class="p">[</span><span class="nc">S</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="s1">'a'</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="n">result</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nc">S</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">hash</span><span class="p">[</span><span class="nc">S</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="s1">'a'</span><span class="p">]);</span> <span class="c1">// 找到字符出现的最远边界</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">right</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">result</span><span class="mf">.</span><span class="nf">push_back</span><span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><p>哈希表：</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="nf">partitionLabels</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">char</span><span class="p">,</span> <span class="n">int</span><span class="o">&gt;</span> <span class="n">map</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+            <span class="n">map</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="n">res</span><span class="p">;</span>
+        <span class="n">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">s</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">map</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]]);</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">right</span><span class="p">){</span>
+                <span class="n">res</span><span class="mf">.</span><span class="nf">push_back</span><span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="56-合并区间"><span class="mr-2">56. 合并区间</span><a href="#56-合并区间" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>以数组 <code class="language-plaintext highlighter-rouge">intervals </code>表示若干个区间的集合，其中单个区间为 <code class="language-plaintext highlighter-rouge">intervals[i] = [starti, endi]</code>。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="err">：</span><span class="n">intervals</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">],[</span><span class="mi">15</span><span class="p">,</span><span class="mi">18</span><span class="p">]]</span>
+<span class="n">输出</span><span class="err">：</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">],[</span><span class="mi">15</span><span class="p">,</span><span class="mi">18</span><span class="p">]]</span>
+<span class="n">解释</span><span class="err">：</span><span class="n">区间</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="n">和</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span> <span class="n">重叠</span><span class="p">,</span> <span class="n">将它们合并为</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span><span class="mf">.</span>
+</pre></table></code></div></div><p>按照<strong>左边界</strong>排序，排序之后局部最优：每次合并都取最大的右边界，这样就可以合并更多的区间了，整体最优：合并所有重叠的区间。按照左边界从小到大排序之后，如果 <code class="language-plaintext highlighter-rouge">intervals[i][0] &lt; intervals[i - 1][1]</code> 即<code class="language-plaintext highlighter-rouge">intervals[i]左边界 &lt; intervals[i - 1]右边界</code>，则一定有重复。</p><p>知道如何判断重复之后，剩下的就是合并了，如何去模拟合并区间呢？其实就是用合并区间后左边界和右边界，作为一个新的区间，加入到<code class="language-plaintext highlighter-rouge">result</code>数组里就可以了，如果没有合并就把原区间加入到<code class="language-plaintext highlighter-rouge">result</code>数组。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;</span> <span class="nf">merge</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;&amp;</span> <span class="n">intervals</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;&gt;</span> <span class="n">result</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">intervals</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+        <span class="nb">sort</span><span class="p">(</span><span class="n">intervals</span><span class="mf">.</span><span class="nf">begin</span><span class="p">(),</span> <span class="n">intervals</span><span class="mf">.</span><span class="nb">end</span><span class="p">());</span>
+        <span class="n">result</span><span class="mf">.</span><span class="nf">push_back</span><span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">intervals</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="mf">.</span><span class="nf">back</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span> <span class="c1">// 合并区间</span>
+                <span class="n">result</span><span class="mf">.</span><span class="nf">back</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="mf">.</span><span class="nf">back</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">result</span><span class="mf">.</span><span class="nf">push_back</span><span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h2 id="738-单调递增的数字"><span class="mr-2">738. 单调递增的数字</span><a href="#738-单调递增的数字" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>当且仅当每个相邻位数上的数字 <code class="language-plaintext highlighter-rouge">x</code> 和 <code class="language-plaintext highlighter-rouge">y</code> 满足 <code class="language-plaintext highlighter-rouge">x &lt;= y</code> 时，我们称这个整数是单调递增的。给定一个整数 <code class="language-plaintext highlighter-rouge">n</code> ，返回 小于或等于 <code class="language-plaintext highlighter-rouge">n</code> 的最大数字，且数字呈单调递增 。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="n">输入</span><span class="o">:</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">9</span>
+<span class="n">输入</span><span class="o">:</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1234</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">1234</span>
+<span class="n">输入</span><span class="o">:</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">332</span>
+<span class="n">输出</span><span class="o">:</span> <span class="mi">299</span>
+</pre></table></code></div></div><p>局部最优：遇到<code class="language-plaintext highlighter-rouge">strNum[i - 1] &gt; strNum[i]</code>的情况，让<code class="language-plaintext highlighter-rouge">strNum[i - 1]--</code>，然后<code class="language-plaintext highlighter-rouge">strNum[i]</code>定为9，可以保证这两位变成最大单调递增整数。全局最优：得到小于等于<code class="language-plaintext highlighter-rouge">n</code>的最大单调递增的整数。</p><p>从前向后遍历的话，遇到strNum[i - 1] &gt; strNum[i]的情况，让strNum[i - 1]减一，但此时如果strNum[i - 1]减一了，可能又小于strNum[i - 2]。</p><blockquote><p>举个例子，数字：332，从前向后遍历的话，那么就变成了329，此时2又小于了第一位的3了，真正的结果应该是299。</p></blockquote><p>所以从前后向遍历会改变已经遍历过的结果！那么从后向前遍历，就可以重复利用上次比较得出的结果了，从后向前遍历332的数值变化为：332 -&gt; 329 -&gt; 299。</p><div class="language-php highlighter-rouge"><div class="code-header"> <span data-label-text="PHP"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="已复制！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre><td class="rouge-code"><pre><span class="kd">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">int</span> <span class="nf">monotoneIncreasingDigits</span><span class="p">(</span><span class="n">int</span> <span class="nc">N</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">string</span> <span class="n">strNum</span> <span class="o">=</span> <span class="nf">to_string</span><span class="p">(</span><span class="nc">N</span><span class="p">);</span>
+        <span class="c1">// flag用来标记赋值9从哪里开始</span>
+        <span class="c1">// 设置为这个默认值，为了防止第二个for循环在flag没有被赋值的情况下执行</span>
+        <span class="n">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="n">strNum</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">strNum</span><span class="mf">.</span><span class="nf">size</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">strNum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">strNum</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+                <span class="n">strNum</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">--</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">strNum</span><span class="mf">.</span><span class="nf">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">strNum</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'9'</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nf">stoi</span><span class="p">(</span><span class="n">strNum</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></table></code></div></div><h1 id="参考资料">参考资料</h1><p><a href="https://labuladong.github.io/algo/">labuladong 的算法小抄 :: labuladong的算法小抄</a></p><p><a href="https://programmercarl.com/">代码随想录 (programmercarl.com)</a></p><p><a href="https://leetcode-cn.com/problemset/all/">题库 - 力扣 (LeetCode) 全球极客挚爱的技术成长平台 (leetcode-cn.com)</a></p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/%E7%AE%97%E6%B3%95%E5%88%B7%E9%A2%98/'>算法刷题</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/%E7%AE%97%E6%B3%95/" class="post-tag no-text-decoration" >算法</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> 本文由作者按照 <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> 进行授权</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">分享</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=%E5%85%AD%E3%80%81%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95+-+%E5%8D%A1%E5%8D%A1%E6%88%90%E9%95%BF%E6%B1%87%E8%81%9A%E9%98%BF%E8%B1%B9&url=%2Fposts%2F%25E5%2585%25AD-%25E8%25B4%25AA%25E5%25BF%2583%25E7%25AE%2597%25E6%25B3%2595%2F" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=%E5%85%AD%E3%80%81%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95+-+%E5%8D%A1%E5%8D%A1%E6%88%90%E9%95%BF%E6%B1%87%E8%81%9A%E9%98%BF%E8%B1%B9&u=%2Fposts%2F%25E5%2585%25AD-%25E8%25B4%25AA%25E5%25BF%2583%25E7%25AE%2597%25E6%25B3%2595%2F" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://t.me/share/url?url=%2Fposts%2F%25E5%2585%25AD-%25E8%25B4%25AA%25E5%25BF%2583%25E7%25AE%2597%25E6%25B3%2595%2F&text=%E5%85%AD%E3%80%81%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95+-+%E5%8D%A1%E5%8D%A1%E6%88%90%E9%95%BF%E6%B1%87%E8%81%9A%E9%98%BF%E8%B1%B9" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="分享链接" data-title-succeed="链接已复制！"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">最近更新</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/%E5%85%B3%E6%B3%A8/">关注</a><li><a href="/posts/%E4%B8%83-%E8%A1%A5%E5%85%85/">七、补充</a><li><a href="/posts/%E5%85%AD-%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/">六、贪心算法</a><li><a href="/posts/%E4%BA%94-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">五、动态规划</a><li><a href="/posts/%E5%9B%9B-%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/">四、回溯算法</a></ul></div><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/%E7%AE%97%E6%B3%95/">算法</a> <a class="post-tag" href="/tags/%E8%B5%84%E6%BA%90/">资源</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">文章内容</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 pl-3 pr-3 pr-xl-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>相关文章</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/%E4%B8%83-%E8%A1%A5%E5%85%85/"><div class="card-body"> <em class="small" data-ts="1655865240" data-df="YYYY-MM-DD" > 2022-06-22 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>七、补充</h3><div class="text-muted small"><p> 7. 整数反转 给你一个 32 位的有符号整数 x ，返回将 x 中的数字部分反转后的结果。如果反转后整数超过 32 位的有符号整数的范围 [−231, 231 − 1] ，就返回 0。假设环境不允许存储 64 位整数（有符号或无符号）。 输入：x = 123 输出：321 class Solution { public: int reverse(int x) { ...</p></div></div></a></div><div class="card"> <a href="/posts/%E4%BA%94-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"><div class="card-body"> <em class="small" data-ts="1656124440" data-df="YYYY-MM-DD" > 2022-06-25 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>五、动态规划</h3><div class="text-muted small"><p> 动态规划是什么？解决动态规划问题有什么技巧？如何学习动态规划？ 首先，动态规划问题的一般形式就是求最值。动态规划其实是运筹学的一种最优化方法，只不过在计算机问题上应用比较多，比如说让你求最长递增子序列呀，最小编辑距离呀等等。 既然是要求最值，核心问题是什么呢？求解动态规划的核心问题是穷举。因为要求最值，肯定要把所有可行的答案穷举出来，然后在其中找最值呗。 首先，虽然动态规划的核心思想就...</p></div></div></a></div><div class="card"> <a href="/posts/%E5%9B%9B-%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/"><div class="card-body"> <em class="small" data-ts="1656124440" data-df="YYYY-MM-DD" > 2022-06-25 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>四、回溯算法</h3><div class="text-muted small"><p> 排列组合子集问题 78. 子集 给你一个整数数组 nums，数组中的元素互不相同 ，返回该数组所有可能的子集（幂集）。解集不能包含重复的子集，你可以按任意顺序 返回解集。 1 2 输入：nums = [1,2,3] 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]] 本质上子集问题就是遍历这样用一棵回溯树： 1 2 3 4 5 6 ...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/%E4%B8%83-%E8%A1%A5%E5%85%85/" class="btn btn-outline-primary" prompt="上一篇"><p>七、补充</p></a> <a href="/posts/%E4%BA%94-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" class="btn btn-outline-primary" prompt="下一篇"><p>五、动态规划</p></a></div></div></div><footer class="row pl-3 pr-3"><div class="col-12 d-flex justify-content-between align-items-center text-muted pl-0 pr-0"><div class="footer-left"><p class="mb-0"> © 2022 <a href="https://twitter.com/username">CARLOSGP2021</a>. <span data-toggle="tooltip" data-placement="top" title="除非另有说明，本网站上的博客文章均由作者按照知识共享署名 4.0 国际 (CC BY 4.0) 许可协议进行授权。">保留部分权利。</span></p></div><div class="footer-right"><p class="mb-0"> 本站由 <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 生成，采用 <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> 主题。</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">热门标签</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/%E7%AE%97%E6%B3%95/">算法</a> <a class="post-tag" href="/tags/%E8%B5%84%E6%BA%90/">资源</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><script src="https://cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js"></script> <script> $(function() { function updateMermaid(event) { if (event.source === window && event.data && event.data.direction === ModeToggle.ID) { const mode = event.data.message; if (typeof mermaid === "undefined") { return; } let expectedTheme = (mode === ModeToggle.DARK_MODE? "dark" : "default"); let config = { theme: expectedTheme }; /* Re-render the SVG › <https://github.com/mermaid-js/mermaid/issues/311#issuecomment-332557344> */ $(".mermaid").each(function() { let svgCode = $(this).prev().children().html(); $(this).removeAttr("data-processed"); $(this).html(svgCode); }); mermaid.initialize(config); mermaid.init(undefined, ".mermaid"); } } let initTheme = "default"; if ($("html[data-mode=dark]").length > 0 || ($("html[data-mode]").length == 0 && window.matchMedia("(prefers-color-scheme: dark)").matches ) ) { initTheme = "dark"; } let mermaidConf = { theme: initTheme /* <default|dark|forest|neutral> */ }; /* Markdown converts to HTML */ $("pre").has("code.language-mermaid").each(function() { let svgCode = $(this).children().html(); $(this).addClass("unloaded"); $(this).after(`<div class=\"mermaid\">${svgCode}</div>`); }); mermaid.initialize(mermaidConf); window.addEventListener("message", updateMermaid); }); </script><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a><div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="false"><div class="toast-header"> <button type="button" class="ml-2 ml-auto close" data-dismiss="toast" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></div><div class="toast-body text-center pt-0"><p class="pl-2 pr-2 mb-3"></p><button type="button" class="btn btn-primary" aria-label="Update"> </button></div></div><script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">搜索结果为空</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/lozad/dist/lozad.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1/dayjs.min.js,npm/dayjs@1/locale/asia/shanghai.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.bundle.min.js"></script> <script defer src="/app.js"></script>
